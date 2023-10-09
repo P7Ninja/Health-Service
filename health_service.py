@@ -14,7 +14,6 @@ database = mysql.connector.connect(
 
 cursor = database.cursor()
 
-
 @app.post("/insertHealth/")
 def InsertHealthEntry(userID, dateStamp, height, weight, fatPercentage, musclePercentage, waterPercentage):
     if(userID == None or dateStamp == None):
@@ -155,10 +154,10 @@ def GetUsersHealthEntries(userID):
 
 # InsertHealthEntry(2, "2023-09-10 20:52:00", 172, 73, 18.3, 40, 32.5)
 
-latestEntry = GetUsersLatestHealthEntry(2)
+# latestEntry = GetUsersLatestHealthEntry(2)
 
-pprint(latestEntry)
+# pprint(latestEntry)
 
-DeleteHealthEntry(2, "2023-09-10 20:52:00", "weight", 73)
+# DeleteHealthEntry(2, "2023-09-10 20:52:00", "weight", 73)
 
 # allEntries = GetUsersHealthEntries(1)
