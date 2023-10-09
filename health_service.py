@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import json
 import mysql.connector
+from pprint import pprint
 
 app = FastAPI()
 
@@ -16,22 +17,57 @@ cursor = database.cursor()
 
 @app.post("/insertHealth/")
 def InsertHealthEntry(userID, dateStamp, height, weight, fatPercentage, musclePercentage, waterPercentage):
+    if(userID == None or dateStamp == None):
+        return
+    
     if(height != None):
-        cursor.execute(f"INSERT INTO heightLog VALUES({userID}, '{dateStamp}', {height})")
+        cursor.execute(f"INSERT INTO heightLog VALUES(0, {userID}, '{dateStamp}', {height})")
         database.commit()
     
     if(weight != None):
-        cursor.execute(f"INSERT INTO weight VALUES({userID}, '{dateStamp}', {weight})")
+        cursor.execute(f"INSERT INTO weightLog VALUES(0, {userID}, '{dateStamp}', {weight})")
         database.commit()
 
-    if(fatPercentage != None | musclePercentage != None | waterPercentage != None):
-        cursor.execute(f"INSERT INTO bodyComposition VALUES({userID}, '{dateStamp}', {fatPercentage}, {musclePercentage}, {waterPercentage})")
+    if(fatPercentage != None):
+        cursor.execute(f"INSERT INTO fatPercentageLog VALUES(0, {userID}, '{dateStamp}', {fatPercentage})")
+        database.commit()
+        
+    if(musclePercentage != None):
+        cursor.execute(f"INSERT INTO musclePercentageLog VALUES(0, {userID}, '{dateStamp}', {musclePercentage})")
+        database.commit()
+        
+    if(waterPercentage != None):
+        cursor.execute(f"INSERT INTO waterPercentageLog VALUES(0, {userID}, '{dateStamp}', {waterPercentage})")
         database.commit()
 
 
+@app.post("/deleteHealth/")
+def DeleteHealthEntry(userID, entryDateStamp, entryType, entryValue):
+    if(userID == None or entryDateStamp == None or entryType == None or entryValue == None):
+        return
 
-def UpdateHealthEntry(userID, weight, height, fatPercentage, musclePercentage, waterPercentage):
-    print("jamen")
+    if(entryType == "height"):
+        cursor.execute(f"DELETE FROM heightLog WHERE dateStamp='{entryDateStamp}' AND height={entryValue}")
+        database.commit()
+  
+    elif(entryType == "weight"):
+        cursor.execute(f"DELETE FROM weightLog WHERE dateStamp='{entryDateStamp}' AND weight={entryValue}")
+        database.commit()
+        
+    elif(entryType == "fatPercentage"):
+        cursor.execute(f"DELETE FROM fatPercentageLog WHERE dateStamp='{entryDateStamp}' AND fatPercentage={entryValue}")
+        database.commit()
+        
+    elif(entryType == "musclePercentage"):
+        cursor.execute(f"DELETE FROM musclePercentageLog WHERE dateStamp='{entryDateStamp}' AND musclePercentage={entryValue}")
+        database.commit()
+        
+    elif(entryType == "waterPercentage"):
+        cursor.execute(f"DELETE FROM waterPercentageLog WHERE dateStamp='{entryDateStamp}' AND waterPercentage={entryValue}")
+        database.commit()
+    
+    else:
+        print(f"There's an error with the entry type: {entryType}")
 
 
 @app.get("/getHealth/")
@@ -117,5 +153,12 @@ def GetUsersHealthEntries(userID):
 
 
 
-latestEntry = GetUsersLatestHealthEntry(1)
-allEntries = GetUsersHealthEntries(1)
+# InsertHealthEntry(2, "2023-09-10 20:52:00", 172, 73, 18.3, 40, 32.5)
+
+latestEntry = GetUsersLatestHealthEntry(2)
+
+pprint(latestEntry)
+
+DeleteHealthEntry(2, "2023-09-10 20:52:00", "weight", 73)
+
+# allEntries = GetUsersHealthEntries(1)
