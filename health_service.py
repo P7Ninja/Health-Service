@@ -31,104 +31,91 @@ def InsertHealthEntry(userID, dateStamp, height, weight, fatPercentage, musclePe
 
 
 def UpdateHealthEntry(userID, weight, height, fatPercentage, musclePercentage, waterPercentage):
-    print(">_<")
+    print("jamen")
 
 
 @app.get("/getHealth/")
-def GetLatestHealthEntry(userID):
-    cursor.execute(f"SELECT height FROM heightLog WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
+def GetUsersLatestHealthEntry(userID):
+    
+    data = {
+        "height": [],
+        "weight": [],
+        "fatPercentage": [],
+        "musclePercentage": [],
+        "waterPercentage": []
+    }
+    
+    # HEIGHT
+    cursor.execute(f"SELECT dateStamp, height FROM heightLog WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
     heightResult = cursor.fetchone()
-    height = heightResult[0]
+    dateStamp = heightResult[0]
+    height = heightResult[1]
+    data["height"].append({"dateStamp": f"{dateStamp}", "height": height})
 
-    cursor.execute(f"SELECT weight FROM weightLog WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
+    # WEIGHT
+    cursor.execute(f"SELECT dateStamp, weight FROM weightLog WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
     weightResult = cursor.fetchone()
-    weight = weightResult[0]
+    dateStamp = weightResult[0]
+    weight = weightResult[1]
+    data["weight"].append({"dateStamp": f"{dateStamp}", "weight": weight})
 
-    cursor.execute(f"SELECT fatPercentage, musclePercentage, waterPercentage FROM bodyComposition WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
-    bodyCompositionResult = cursor.fetchone()
-    fatPercentage = bodyCompositionResult[0]
-    musclePercentage = bodyCompositionResult[1]
-    waterPercentage = bodyCompositionResult[2]
-
-    result = f'{{"userid": {userID}, "height": {height}, "weight": {weight}, "fatPercentage": {fatPercentage}, "musclePercentage": {musclePercentage}, "waterPercentage": {waterPercentage}}}'
-
-    jsonFile = json.loads(result)
-    return jsonFile
+    # FAT
+    cursor.execute(f"SELECT dateStamp, fatPercentage FROM fatPercentageLog WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
+    fatPercentageResult = cursor.fetchone()
+    dateStamp = fatPercentageResult[0]
+    fatPercentage = fatPercentageResult[1]
+    data["fatPercentage"].append({"dateStamp": f"{dateStamp}", "fatPercentage": fatPercentage})
+    
+    # MUSCLE
+    cursor.execute(f"SELECT dateStamp, musclePercentage FROM musclePercentageLog WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
+    musclePercentageResult = cursor.fetchone()
+    dateStamp = musclePercentageResult[0]
+    musclePercentage = musclePercentageResult[1]
+    data["musclePercentage"].append({"dateStamp": f"{dateStamp}", "musclePercentage": musclePercentage})
+    
+    # WATER
+    cursor.execute(f"SELECT dateStamp, waterPercentage FROM waterPercentageLog WHERE userID={userID} ORDER BY id DESC LIMIT 0, 1")
+    waterPercentageResult = cursor.fetchone()
+    dateStamp = waterPercentageResult[0]
+    waterPercentage = waterPercentageResult[1]
+    data["waterPercentage"].append({"dateStamp": f"{dateStamp}", "waterPercentage": waterPercentage})
+    
+    return data
 
 @app.get("/UserHealthHistory")
-def GetAllUserHealthEntries(userID):
+def GetUsersHealthEntries(userID):
+
+    data = {
+        "height": [],
+        "weight": [],
+        "fatPercentage": [],
+        "musclePercentage": [],
+        "waterPercentage": []
+    }
 
     cursor.execute(f"SELECT dateStamp, height FROM heightLog WHERE userID={userID} ORDER BY id DESC")
-
-    index = 1
-    allUserHeightEntries = ""
     for entry in cursor.fetchall():
-        dateStamp = entry[0]
-        height = entry[1]
-        allUserHeightEntries += f'"entry{index}": {{"dateStamp": "{dateStamp}", "height": {height}}},'
-        index += 1
-    allUserHeightEntries = allUserHeightEntries[:-1]
+        data["height"].append({"dateStamp": f"{entry[0]}", "height": entry[1]})
 
     cursor.execute(f"SELECT dateStamp, weight FROM weightLog WHERE userID={userID} ORDER BY id DESC")
-    index = 1
-    allUserWeightEntries = ""
     for entry in cursor.fetchall():
-        dateStamp = entry[0]
-        weight = entry[1]
-        allUserWeightEntries += f'"entry{index}": {{"dateStamp": "{dateStamp}", "weight": {weight}}},'
-        index += 1
-    allUserWeightEntries = allUserWeightEntries[:-1]
-
-    # cursor.execute(f"SELECT dateStamp, fatPercentage, musclePercentage, waterPercentage FROM bodyComposition WHERE userID={userID} ORDER BY id DESC")
-    # index = 1
-    # allUserBodyCompositionEntries = ""
-    # for entry in cursor.fetchall():
-    #     dateStamp = entry[0]
-    #     fatPercentage = entry[1]
-    #     musclePercentage = entry[2]
-    #     waterPercentage = entry[3]
-    #     allUserBodyCompositionEntries += f'"entry{index}": {{"dateStamp": "{dateStamp}", "fatPercentage": {fatPercentage}, "musclePercentage": {musclePercentage}, "waterPercentage": {waterPercentage}}},'
-    #     index += 1
-    # allUserBodyCompositionEntries = allUserBodyCompositionEntries[:-1]
+        data["weight"].append({"dateStamp": f"{entry[0]}", "weight": entry[1]})
 
     cursor.execute(f"SELECT dateStamp, fatPercentage FROM fatPercentageLog WHERE userID={userID} ORDER BY id DESC")
-    index = 1
-    allUserFatPercentageEntries = ""
     for entry in cursor.fetchall():     
-        dateStamp = entry[0]
-        fatPercentage = entry[1]
-        allUserFatPercentageEntries += f'"entry{index}": {{"dateStamp": "{dateStamp}", "fatPercentage": {fatPercentage}}},'
-        index += 1
-    allUserFatPercentageEntries = allUserFatPercentageEntries[:-1]
+        data["fatPercentage"].append({"dateStamp": f"{entry[0]}", "fatPercentage": entry[1]})
 
     cursor.execute(f"SELECT dateStamp, musclePercentage FROM musclePercentageLog WHERE userID={userID} ORDER BY id DESC")
-    index = 1
-    allUserMusclePercentageEntries = ""
     for entry in cursor.fetchall():     
-        dateStamp = entry[0]
-        musclePercentage = entry[1]
-        allUserMusclePercentageEntries += f'"entry{index}": {{"dateStamp": "{dateStamp}", "musclePercentage": {musclePercentage}}},'
-        index += 1
-    allUserMusclePercentageEntries = allUserMusclePercentageEntries[:-1]
+        data["musclePercentage"].append({"dateStamp": f"{entry[0]}", "musclePercentage": entry[1]})
 
     cursor.execute(f"SELECT dateStamp, waterPercentage FROM waterPercentageLog WHERE userID={userID} ORDER BY id DESC")
-    index = 1
-    allUserWaterPercentageEntries = ""
     for entry in cursor.fetchall():     
-        dateStamp = entry[0]
-        waterPercentage = entry[1]
-        allUserFatPercentageEntries += f'"entry{index}": {{"dateStamp": "{dateStamp}", "waterPercentage": {waterPercentage}}},'
-        index += 1
-    allUserWaterPercentageEntries = allUserWaterPercentageEntries[:-1]
+        data["waterPercentage"].append({"dateStamp": f"{entry[0]}", "waterPercentage": entry[1]})
 
-    result = f'{{"height": {{{allUserHeightEntries}}}, "weight": {{{allUserWeightEntries}}}, "fatPercentage": {{{allUserFatPercentageEntries}}}, "musclePercentage": {{{allUserMusclePercentageEntries}}}, "waterPercentage": {{{allUserWaterPercentageEntries}}}}}'
-    jsonFile = json.loads(result)
-
-    with open('test.json', 'w') as f:
-        json.dump(jsonFile, f)
-    return jsonFile
+    return data
 
 
-# InsertHealthEntry(2)
-# GetLatestHealthEntry(1)
-GetAllUserHealthEntries(1)
+
+latestEntry = GetUsersLatestHealthEntry(1)
+allEntries = GetUsersHealthEntries(1)
