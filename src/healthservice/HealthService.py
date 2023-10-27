@@ -26,7 +26,7 @@ class HealthService:
         self.__app.add_api_route("/UserHealthHistory", self.GetUsersHealthEntries, methods=["GET"])
         
     async def InsertHealthEntry(self, health: BaseHealthEntry):
-        return self.__db.InsertHealthEntry(health)
+        return self.__db.InsertHealthEntry(health) 
     
     async def DeleteHealthEntry(self, 
                           id: int = 0, 
