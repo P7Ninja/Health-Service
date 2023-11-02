@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker, session
 from .model import sql as model
 from .factory import health_from_schema, health_from_sql_model
+from fastapi import HTTPException, status
 
 class SQLHealthDB(BaseHealthDB):
     
@@ -21,45 +22,58 @@ class SQLHealthDB(BaseHealthDB):
         session.close_all_sessions()
         self.__engine.dispose()
     
-        
-    def InsertHealthEntry(self, healthEntry: HealthEntry):
-        if(healthEntry.dateStamp == None):
-            return 
-        
+    
+    def check_optional_fields(cls, health : BaseHealthEntry):
+        if (health.height and health.weight and health.fatPercentage and health.musclePercentage and health.waterPercentage) is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one of the optional fields must have a value")
+    
+    def InsertHealthEntry(self, healthEntry: BaseHealthEntry):   
         try: 
+            self.check_optional_fields(healthEntry)
             db_health = health_from_schema(self.__db, healthEntry)
         except SQLAlchemyError as e:
             self.__db.rollback()
-            return e
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
         return db_health
         
 
     def DeleteHealthEntry(self, id):        
         if(id == None):
-            return
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad Request - No ID provided")
 
         health = self.__db.query(model.Health).filter(model.Health.id == id).first()
             
         try:
             if health is None:
-                return False
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found - No entry with that ID exists")
             self.__db.delete(health)
             self.__db.commit()
         except SQLAlchemyError as e:
             self.__db.rollback()
-            return False
-        return True
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+        return 
 
     def GetUsersLatestHealthEntry(self, userID):
         
         health = self.__db.query(model.Health).filter(model.Health.userID == userID).first()
-        return health_from_sql_model(health)   
+        
+        if health == None: # might not be reached
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad Request - User not found or no entries exist for the user")
+        
+        db_health = health_from_sql_model(health)
+        self.check_optional_fields(db_health)
+        return db_health
 
     def GetUsersHealthEntries(self, userID):
         healthList = []
         health = self.__db.query(model.Health).filter(model.Health.userID == userID).all()
+        
+        if health == None: # might not be reached
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad Request - User not found or no entries exist for the user")
+        
         for h in health:
             healthList.append(health_from_sql_model(h))
+            
         return healthList
 
         

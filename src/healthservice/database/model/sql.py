@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, ForeignKey, Integer, String, Double, Table, Text, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, Double, Table, Text, create_engine, DateTime, func
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, sessionmaker, mapped_column
 from typing import List
 
@@ -9,7 +9,7 @@ class Health(Base):
     __tablename__ = "healthLog"
     id = Column(Integer, nullable=False, autoincrement=True, primary_key=True)
     userID = Column(Integer)
-    dateStamp = Column(String(50))
+    dateStamp = Column(DateTime, default=func.now())
     height = Column(Double)
     weight = Column(Double)
     fatPercentage = Column(Double)

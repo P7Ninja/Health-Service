@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, status
 from .database import BaseHealthDB
 from .database.health_schema import HealthEntry, BaseHealthEntry, Health, BaseHealth
 from typing import Annotated
@@ -24,14 +24,16 @@ class HealthService:
         self.__app.add_api_route("/deleteHealth", self.DeleteHealthEntry, methods=["DELETE"])
         self.__app.add_api_route("/getHealth", self.GetUsersLatestHealthEntry, methods=["GET"])
         self.__app.add_api_route("/UserHealthHistory", self.GetUsersHealthEntries, methods=["GET"])
-        
+    
     async def InsertHealthEntry(self, health: BaseHealthEntry):
-        return self.__db.InsertHealthEntry(health) 
+        self.__db.InsertHealthEntry(health)
+        return {"success": True} 
     
     async def DeleteHealthEntry(self, 
                           id: int = 0, 
                           ):
-        return self.__db.DeleteHealthEntry(id)
+        self.__db.DeleteHealthEntry(id)
+        return {"success": True}
     
     async def GetUsersLatestHealthEntry(self, 
                                   userID: int = 0):

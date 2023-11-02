@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator, root_validator
+from datetime import datetime
+from typing import Optional
 
 class BaseHealth(BaseModel):
     entry: list['BaseHealthEntry']
@@ -8,12 +10,14 @@ class Health(BaseHealth):
         
 class BaseHealthEntry(BaseModel):
     userID: int
-    dateStamp: str
-    height: float
-    weight: float
-    fatPercentage: float
-    musclePercentage: float
-    waterPercentage: float
+    dateStamp: datetime
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    fatPercentage: Optional[float] = None
+    musclePercentage:Optional[float] = None
+    waterPercentage: Optional[float] = None
+        
+        
 
 class HealthEntry(BaseHealthEntry):
     id: int
