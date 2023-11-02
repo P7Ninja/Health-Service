@@ -68,7 +68,7 @@ class SQLHealthDB(BaseHealthDB):
         healthList = []
         health = self.__db.query(model.Health).filter(model.Health.userID == userID).all()
         
-        if health == None: # might not be reached
+        if health == []: # might not be reached
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad Request - User not found or no entries exist for the user")
         
         for h in health:
