@@ -24,7 +24,7 @@ class SQLHealthDB(BaseHealthDB):
     
     
     def check_optional_fields(cls, health : BaseHealthEntry):
-        if (health.height and health.weight and health.fatPercentage and health.musclePercentage and health.waterPercentage) is None:
+        if not [x for x in (health.height, health.weight, health.fatPercentage, health.musclePercentage, health.waterPercentage) if x is not None]:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one of the optional fields must have a value")
     
     def InsertHealthEntry(self, healthEntry: BaseHealthEntry):   
