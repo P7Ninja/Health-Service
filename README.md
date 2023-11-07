@@ -32,6 +32,9 @@ uvicorn app.server:app --reload
 ```
 
 
-
+### Test
+```
+pytest tests
+```
 
 
