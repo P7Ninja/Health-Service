@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from dotenv import dotenv_values
 
 from healthservice import SQLHealthDB, HealthService
+import os
 
-cfg = dotenv_values(".env")
+cfg = os.environ
 
 app = FastAPI()
 db = SQLHealthDB(cfg)
