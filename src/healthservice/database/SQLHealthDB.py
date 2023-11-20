@@ -34,24 +34,24 @@ class SQLHealthDB(BaseHealthDB):
         except SQLAlchemyError as e:
             self.__db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
-        return db_health
+
         
 
-    def DeleteHealthEntry(self, id):        
+    def DeleteHealthEntry(self, id: int, userID: int):        
         if(id == None):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad Request - No ID provided")
 
-        health = self.__db.query(model.Health).filter(model.Health.id == id).first()
+        health = self.__db.query(model.Health).filter(model.Health.id == id, model.Health.userID == userID).first()
         if health is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found - No entry with that ID exists")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found - No entry with that ID exists or user does not own the entry")
             
         try:
             self.__db.delete(health)
             self.__db.commit()
         except SQLAlchemyError as e:
             self.__db.rollback()
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
-        return 
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+
 
     def GetUsersLatestHealthEntry(self, userID):
         

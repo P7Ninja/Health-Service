@@ -53,7 +53,7 @@ def test_InsertHealthEntry(db: SQLHealthDB):
 def test_DeleteHealthEntry(db: SQLHealthDB):
     entry = db.GetUsersLatestHealthEntry(3)
     assert entry is not None
-    db.DeleteHealthEntry(entry.id)
+    db.DeleteHealthEntry(entry.id, 3)
     next_entry = db.GetUsersLatestHealthEntry(3)
     assert next_entry.id is not entry.id
 

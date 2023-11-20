@@ -62,7 +62,7 @@ def test_InsertHealthEntry(client: TestClient):
     
     
 def test_DeleteHealthEntry(client: TestClient):
-    res1 = client.delete("/deleteHealth?id=3")
+    res1 = client.delete("/deleteHealth?id=3&userID=0")
     assert res1.status_code == 200
     assert res1.json() == {"success": True}
 

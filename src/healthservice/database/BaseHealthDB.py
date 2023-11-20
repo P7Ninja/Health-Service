@@ -14,13 +14,13 @@ class BaseHealthDB:
     def InsertHealthEntry(self, healthEntry: HealthEntry) -> None:
         return
     
-    def DeleteHealthEntry(self, userID: int, entryDateStamp: str, entryType: str, entryValue: float) -> None:
+    def DeleteHealthEntry(self, id: int, userID: int) -> None:
         return
     
-    def GetUsersLatestHealthEntry(self, userID: int) -> None:
+    def GetUsersLatestHealthEntry(self, userID: int) -> HealthEntry:
         return
     
-    def GetUsersHealthEntries(self, userID: int) -> None:
+    def GetUsersHealthEntries(self, userID: int) -> list[HealthEntry]:
         return
 
 
