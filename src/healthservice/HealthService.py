@@ -30,17 +30,17 @@ class HealthService:
         return {"success": True} 
     
     async def DeleteHealthEntry(self, 
-                          id: int = 0, 
+                          id: int, userID: int
                           ):
-        self.__db.DeleteHealthEntry(id)
+        self.__db.DeleteHealthEntry(id, userID)
         return {"success": True}
     
     async def GetUsersLatestHealthEntry(self, 
-                                  userID: int = 0):
+                                  userID: int):
         return self.__db.GetUsersLatestHealthEntry(userID)
     
     async def GetUsersHealthEntries(self, 
-                              userID: int = 0):
+                              userID: int):
         return self.__db.GetUsersHealthEntries(userID)
     
     
