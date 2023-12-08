@@ -57,9 +57,6 @@ class SQLHealthDB(BaseHealthDB):
         
         health = self.__db.query(model.Health).filter(model.Health.userID == userID).first()
         
-        if health == None: # might not be reached
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad Request - User not found or no entries exist for the user")
-        
         db_health = health_from_sql_model(health)
         self.check_optional_fields(db_health)
         return db_health
@@ -67,9 +64,6 @@ class SQLHealthDB(BaseHealthDB):
     def GetUsersHealthEntries(self, userID):
         healthList = []
         health = self.__db.query(model.Health).filter(model.Health.userID == userID).all()
-        
-        if health == []: # might not be reached
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad Request - User not found or no entries exist for the user")
         
         for h in health:
             healthList.append(health_from_sql_model(h))
